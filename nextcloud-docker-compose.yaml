@@ -1,0 +1,51 @@
+volumes:
+  nextcloud:
+  mariadb:
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=
+      - MYSQL_USER=
+
+  nextcloud:
+    image: nextcloud
+    restart: always
+    #links:
+    #  - mariadb
+    expose:
+      - "80"
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=
+      - MYSQL_USER=
+      - MYSQL_HOST=
+      - NEXTCLOUD_TRUSTED_DOMAINS=
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:stable-alpine3.23-perl
+    container_name: nginx_reverse
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-enabled.conf:/etc/nginx/sites-enabled.conf:ro
+      - ./certs/cert.pem:/etc/ssl/cert.pem:ro
+      - ./certs/cert-key.pem:/etc/ssl/cert-key.pem:ro
+    networks:
+      - internal
+
+networks:
+  internal:

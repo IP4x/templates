@@ -32,16 +32,18 @@ services:
       - MYSQL_PASSWORD=
       - MYSQL_DATABASE=
       - MYSQL_USER=
-      - MYSQL_HOST=
+      - MYSQL_HOST=mariadb
+      - NEXTCLOUD_ADMIN_USER=
+      - NEXTCLOUD_ADMIN_PASSWORD=
       - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.test.local 192.168.0.2 localhost
       - NEXTCLOUD_OVERWRITEHOST=nextcloud.test.local
       - NEXTCLOUD_OVERWRITEPROTOCOL=https
-      - NEXTCLOUD_OVERWRITEWEBROOT=/
+      - NEXTCLOUD_OVERWRITECLIURL=https://nextcloud.test.local
     networks:
       - internal
 
   nginx:
-    image: nginx:stable-alpine3.23-perl
+    image: nginx:latest
     container_name: nginx_reverse
     ports:
       - "80:80"

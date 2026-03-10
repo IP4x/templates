@@ -4,7 +4,7 @@ ervices:
     container_name: traefik
     command:
       - --providers.docker=true
-      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --providers.file.filename=/etc/traefik/dynamic.yaml
       - --entrypoints.websecure.address=:443
       - --log.level=DEBUG
     ports:

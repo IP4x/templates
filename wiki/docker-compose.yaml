@@ -1,0 +1,36 @@
+ervices:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    command:
+      - --providers.docker=true
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --entrypoints.websecure.address=:443
+      - --log.level=DEBUG
+    ports:
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/etc/traefik
+      - ./certs:/certs
+    restart: unless-stopped
+
+
+  otterwiki:
+    image: redimp/otterwiki:latest
+    restart: unless-stopped
+    #ports:
+    #- 8080:80
+    volumes:
+      - ./app-data:/app-data
+    environment:
+      SITE_NAME: 'Otterwiki'
+      SERVER_NAME: 'wiki.test.local'
+      SITE_LANG: 'en'
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.otterwiki.rule=Host(`wiki.test.local`)"
+      - "traefik.http.routers.otterwiki.entrypoints=websecure"
+      - "traefik.http.routers.otterwiki.tls=true"
+      - "traefik.http.services.otterwiki.loadbalancer.server.port=80"
